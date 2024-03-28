@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"></title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 10vw;
+        }
+
+        .title {
+            font-size: 50px;
+            color: red;
+        }
+
+        .message {
+            font-size: 24px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="https://api.mulham.co/p/logo" alt="logo" class="logo"/>
+    <h1 class="title" th:text="${heading}">✓ Success !</h1>
+    <p class="message" th:text="${message}"></p>
+</div>
+</body>
+</html>
