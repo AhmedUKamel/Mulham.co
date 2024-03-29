@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.ahmedukamel.mulham.model.Token;
 import org.ahmedukamel.mulham.model.User;
 import org.ahmedukamel.mulham.repository.TokenRepository;
+import org.ahmedukamel.mulham.repository.UserRepository;
 import org.ahmedukamel.mulham.service.db.DatabaseFetcher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
@@ -15,12 +16,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class WebViewService implements IWebViewService {
-    final TokenRepository repository;
+    final TokenRepository tokenRepository;
+    final UserRepository userRepository;
 
     @Override
     public ModelAndView activateAccount(UUID tokenId, String email) {
         try {
-            Token token = DatabaseFetcher.get(repository::findById, tokenId, Token.class);
+            Token token = DatabaseFetcher.get(tokenRepository::findById, tokenId, Token.class);
             User user = token.getUser();
 
             if (!user.getEmail().equalsIgnoreCase(email.strip())) {
@@ -36,8 +38,10 @@ public class WebViewService implements IWebViewService {
             }
 
             user.setEnabled(true);
+            userRepository.save(user);
+
             token.setUsed(true);
-            repository.save(token);
+            tokenRepository.save(token);
 
             return new ModelAndView("account-activation-page");
         } catch (Exception ex) {

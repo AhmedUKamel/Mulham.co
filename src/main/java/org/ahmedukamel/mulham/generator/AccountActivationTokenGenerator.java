@@ -15,7 +15,6 @@ import java.util.function.Function;
 public class AccountActivationTokenGenerator implements Function<User, Token> {
     final TokenRepository repository;
 
-
     @Override
     public Token apply(User user) {
         Token token = new Token();
@@ -23,6 +22,7 @@ public class AccountActivationTokenGenerator implements Function<User, Token> {
         token.setType(TokenType.ACCOUNT_ACTIVATION);
         token.setExpiration(LocalDateTime.now().plusDays(1));
 
+        repository.revokeUserTokens(user, TokenType.ACCOUNT_ACTIVATION);
         user.getTokens().add(token);
         return repository.save(token);
     }

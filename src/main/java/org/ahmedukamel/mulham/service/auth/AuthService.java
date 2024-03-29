@@ -60,7 +60,7 @@ public class AuthService implements IAuthService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         repository.save(user);
-        CompletableFuture<Token> tokenFuture = CompletableFuture.supplyAsync(() -> generator.apply(user));
+        CompletableFuture<Token> tokenFuture = CompletableFuture.supplyAsync(() -> generator.apply(user), executor);
         tokenFuture.thenAcceptAsync(mailSender::send, executor);
 
         String message = messageSource.getMessage("successful.register", null, Locale.ENGLISH);

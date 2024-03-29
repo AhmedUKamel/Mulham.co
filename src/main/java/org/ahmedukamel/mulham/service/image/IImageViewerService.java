@@ -5,5 +5,5 @@ import java.io.IOException;
 public interface IImageViewerService {
     Object getProfilePicture(String imageName) throws IOException;
 
-    Object getLogo() throws IOException;
+    Object getImage(String imageName) throws IOException;
 }

@@ -20,20 +20,20 @@ public class ImageViewerService implements IImageViewerService {
 
         if (image == null) {
             Resource resource = new ClassPathResource("static/images/no-profile-picture.png");
-            if (!resource.isReadable()) {
-                throw new RuntimeException("No profile image found.");
-            }
             image = resource.getContentAsByteArray();
         }
+
         return image;
     }
 
     @Override
-    public Object getLogo() throws IOException {
-        Resource resource = new ClassPathResource("static/images/logo.png");
+    public Object getImage(String imageName) throws IOException {
+        Resource resource = new ClassPathResource("static/images/" + imageName);
+
         if (!resource.isReadable()) {
-            throw new RuntimeException("No profile image found.");
+            resource = new ClassPathResource("static/images/image-not-found.png");
         }
+
         return resource.getContentAsByteArray();
     }
 }

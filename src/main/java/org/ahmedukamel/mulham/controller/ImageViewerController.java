@@ -28,9 +28,9 @@ public class ImageViewerController {
                 .body(response);
     }
 
-    @GetMapping(value = "logo")
-    public ResponseEntity<Object> getLogo() throws IOException {
-        Object response = service.getLogo();
+    @GetMapping(value = "{imageName}")
+    public ResponseEntity<Object> getImage(@PathVariable(value = "imageName") String imageName) throws IOException {
+        Object response = service.getImage(imageName);
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)
                 .body(response);

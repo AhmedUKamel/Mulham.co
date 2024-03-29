@@ -1,8 +1,6 @@
 spring:
   application:
     name: mulham
-  config:
-    import: file:.env[.properties]
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     open-in-view: false
