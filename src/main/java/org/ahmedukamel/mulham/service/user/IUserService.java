@@ -1,5 +1,9 @@
 package org.ahmedukamel.mulham.service.user;
 
 public interface IUserService {
-    Object getUserProfile(Long userId);
+    Object getUser(Long userId);
+
+    Object getUsers();
+
+    Object getUsers(long pageSize, long pageNumber);
 }

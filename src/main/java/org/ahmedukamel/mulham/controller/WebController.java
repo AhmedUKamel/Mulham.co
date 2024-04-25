@@ -1,8 +1,7 @@
 package org.ahmedukamel.mulham.controller;
 
-import jakarta.validation.constraints.NotBlank;
 import org.ahmedukamel.mulham.service.web.IWebViewService;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.ahmedukamel.mulham.service.web.WebViewService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,7 +13,7 @@ import java.util.UUID;
 public class WebController {
     final IWebViewService service;
 
-    public WebController(@Qualifier(value = "webViewService") IWebViewService service) {
+    public WebController(WebViewService service) {
         this.service = service;
     }
 

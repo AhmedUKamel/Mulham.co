@@ -16,9 +16,11 @@ public class ImageViewerService implements IImageViewerService {
 
     @Override
     public Object getProfilePicture(String imageName) throws IOException {
-        byte[] image = fileService.get(imageName, DirectoryConstants.PROFILE_IMAGES);
+        byte[] image;
 
-        if (image == null) {
+        try {
+            image = fileService.get(imageName, DirectoryConstants.PROFILE_IMAGES);
+        } catch (IOException exception) {
             Resource resource = new ClassPathResource("static/images/no-profile-picture.png");
             image = resource.getContentAsByteArray();
         }
@@ -28,7 +30,7 @@ public class ImageViewerService implements IImageViewerService {
 
     @Override
     public Object getImage(String imageName) throws IOException {
-        Resource resource = new ClassPathResource("static/images/" + imageName);
+        Resource resource = new ClassPathResource("static/images/%s".formatted(imageName));
 
         if (!resource.isReadable()) {
             resource = new ClassPathResource("static/images/image-not-found.png");

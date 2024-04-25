@@ -1,7 +1,7 @@
 package org.ahmedukamel.mulham.service.web;
 
 import lombok.RequiredArgsConstructor;
-import org.ahmedukamel.mulham.model.Token;
+import org.ahmedukamel.mulham.model.AccountToken;
 import org.ahmedukamel.mulham.model.User;
 import org.ahmedukamel.mulham.repository.TokenRepository;
 import org.ahmedukamel.mulham.repository.UserRepository;
@@ -22,16 +22,16 @@ public class WebViewService implements IWebViewService {
     @Override
     public ModelAndView activateAccount(UUID tokenId, String email) {
         try {
-            Token token = DatabaseFetcher.get(tokenRepository::findById, tokenId, Token.class);
-            User user = token.getUser();
+            AccountToken accountToken = DatabaseFetcher.get(tokenRepository::findById, tokenId, AccountToken.class);
+            User user = accountToken.getUser();
 
             if (!user.getEmail().equalsIgnoreCase(email.strip())) {
                 throw new RuntimeException("Invalid token or email.");
-            } else if (token.isRevoked()) {
+            } else if (accountToken.isRevoked()) {
                 throw new RuntimeException("This token is revoked.");
-            } else if (token.isUsed()) {
+            } else if (accountToken.isUsed()) {
                 throw new RuntimeException("This token is used.");
-            } else if (token.getExpiration().isBefore(LocalDateTime.now())) {
+            } else if (accountToken.getExpiration().isBefore(LocalDateTime.now())) {
                 throw new RuntimeException("This token is expired.");
             } else if (user.isEnabled()) {
                 throw new RuntimeException("Already activated user account.");
@@ -40,8 +40,8 @@ public class WebViewService implements IWebViewService {
             user.setEnabled(true);
             userRepository.save(user);
 
-            token.setUsed(true);
-            tokenRepository.save(token);
+            accountToken.setUsed(true);
+            tokenRepository.save(accountToken);
 
             return new ModelAndView("account-activation-page");
         } catch (Exception ex) {

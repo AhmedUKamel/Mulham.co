@@ -11,5 +11,5 @@ public interface IProfileService {
 
     Object setProfilePicture(MultipartFile file) throws IOException;
 
-    Object removeProfilePicture() throws IOException;
+    void removeProfilePicture() throws IOException;
 }

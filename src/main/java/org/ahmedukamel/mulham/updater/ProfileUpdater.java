@@ -3,9 +3,10 @@ package org.ahmedukamel.mulham.updater;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-import org.ahmedukamel.mulham.dto.request.UpdateProfileRequest;
+import org.ahmedukamel.mulham.dto.profile.UpdateProfileRequest;
 import org.ahmedukamel.mulham.model.User;
-import org.ahmedukamel.mulham.util.LocalDateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,8 @@ import java.util.function.BiConsumer;
 
 @Component
 public class ProfileUpdater implements BiConsumer<User, UpdateProfileRequest> {
+    private static final Logger logger = LoggerFactory.getLogger(ProfileUpdater.class);
+
     @Override
     public void accept(User user, UpdateProfileRequest request) {
         BeanUtils.copyProperties(request, user);
@@ -21,16 +24,12 @@ public class ProfileUpdater implements BiConsumer<User, UpdateProfileRequest> {
             PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(request.phoneNumber(), "SA");
             user.setCountryCode(phoneNumber.getCountryCode());
             user.setNationalNumber(phoneNumber.getNationalNumber());
-        } catch (NumberParseException ignore) {
+        } catch (NumberParseException exception) {
+            logger.error("Phone Number Parse Failed: %s".formatted(exception.getMessage()));
         }
 
-        try {
-            user.setDateOfBirth(LocalDateUtils.getDate(request.dateOfBirth()));
-        } catch (Exception ignore) {
-        }
-
-        if (request.theGander() != null) {
-            user.setGender(request.theGander());
+        if (request.theGender() != null) {
+            user.setGender(request.theGender());
         }
     }
 }

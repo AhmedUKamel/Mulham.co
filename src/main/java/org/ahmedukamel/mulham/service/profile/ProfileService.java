@@ -2,81 +2,83 @@ package org.ahmedukamel.mulham.service.profile;
 
 import lombok.RequiredArgsConstructor;
 import org.ahmedukamel.mulham.constant.DirectoryConstants;
-import org.ahmedukamel.mulham.dto.response.ProfileResponse;
-import org.ahmedukamel.mulham.dto.request.UpdateProfileRequest;
+import org.ahmedukamel.mulham.dto.profile.UpdateProfileRequest;
 import org.ahmedukamel.mulham.dto.response.ApiResponse;
-import org.ahmedukamel.mulham.mapper.ProfileMapper;
+import org.ahmedukamel.mulham.dto.profile.ProfileResponse;
+import org.ahmedukamel.mulham.mapper.profile.ProfileResponseMapper;
 import org.ahmedukamel.mulham.model.User;
 import org.ahmedukamel.mulham.repository.UserRepository;
 import org.ahmedukamel.mulham.service.file.IFileService;
 import org.ahmedukamel.mulham.updater.ProfileUpdater;
 import org.ahmedukamel.mulham.util.ContextHolderUtils;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Locale;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class ProfileService implements IProfileService {
-    final MessageSource messageSource;
     final UserRepository repository;
-    final IFileService fileService;
-    final ProfileMapper mapper;
+    final IFileService service;
+    final ProfileResponseMapper mapper;
     final ProfileUpdater updater;
 
     @Override
     public Object updateProfile(Object object) {
         UpdateProfileRequest request = (UpdateProfileRequest) object;
         User user = ContextHolderUtils.getUserOrElseThrow();
+
         updater.accept(user, request);
-        repository.save(user);
-        String message = messageSource.getMessage("successful.update.profile", null, Locale.ENGLISH);
-        return new ApiResponse(true, message, null);
+
+        User savedUser = repository.save(user);
+        ProfileResponse response = mapper.apply(savedUser);
+
+        return new ApiResponse(true, "User profile have been updated successfully.", response);
     }
 
     @Override
     public Object getProfile() {
         User user = ContextHolderUtils.getUserOrElseThrow();
-        ProfileResponse data = mapper.apply(user);
-        String message = messageSource.getMessage("successful.get.profile", null, Locale.ENGLISH);
-        return new ApiResponse(true, message, Map.of("profile", data));
+        ProfileResponse response = mapper.apply(user);
+
+        return new ApiResponse(true, "User profile have been fetched successfully.", response);
     }
 
     @Override
     public Object setProfilePicture(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new RuntimeException("Missing profile picture.");
+        }
+
         User user = ContextHolderUtils.getUserOrElseThrow();
         String imageName = user.getPicture();
 
         if (StringUtils.hasLength(imageName)) {
-            fileService.delete(imageName, DirectoryConstants.PROFILE_IMAGES);
+            service.delete(imageName, DirectoryConstants.PROFILE_IMAGES);
         }
 
-        String name = user.getId() + System.currentTimeMillis() + "";
-        imageName = fileService.save(file, name);
+        imageName = user.getId() + System.currentTimeMillis() + "";
+        imageName = service.save(file, imageName, DirectoryConstants.PROFILE_IMAGES);
         user.setPicture(imageName);
         repository.save(user);
 
-        String message = messageSource.getMessage("successful.save.profile.image", null, Locale.ENGLISH);
-        return new ApiResponse(true, message, null);
+        return new ApiResponse(true, "User profile image have been saved successfully.", "");
     }
 
     @Override
-    public Object removeProfilePicture() throws IOException {
+    public void removeProfilePicture() throws IOException {
         User user = ContextHolderUtils.getUserOrElseThrow();
         String imageName = user.getPicture();
 
         if (StringUtils.hasLength(imageName)) {
-            fileService.delete(imageName, DirectoryConstants.PROFILE_IMAGES);
+            service.delete(imageName, DirectoryConstants.PROFILE_IMAGES);
             user.setPicture(null);
             repository.save(user);
+            return;
         }
 
-        String message = messageSource.getMessage("successful.remove.profile.image", null, Locale.ENGLISH);
-        return new ApiResponse(true, message, null);
+        throw new RuntimeException("No profile picture found.");
     }
 }

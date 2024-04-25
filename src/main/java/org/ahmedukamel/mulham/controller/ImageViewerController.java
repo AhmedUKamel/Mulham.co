@@ -1,7 +1,7 @@
 package org.ahmedukamel.mulham.controller;
 
 import org.ahmedukamel.mulham.service.image.IImageViewerService;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.ahmedukamel.mulham.service.image.ImageViewerService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,11 +16,11 @@ import java.io.IOException;
 public class ImageViewerController {
     final IImageViewerService service;
 
-    public ImageViewerController(@Qualifier(value = "imageViewerService") IImageViewerService service) {
+    public ImageViewerController(ImageViewerService service) {
         this.service = service;
     }
 
-    @GetMapping(value = "image/{imageName}")
+    @GetMapping(value = "profile/{imageName}")
     public ResponseEntity<Object> getProfilePicture(@PathVariable(value = "imageName") String imageName) throws IOException {
         Object response = service.getProfilePicture(imageName);
         return ResponseEntity.ok()
@@ -28,7 +28,7 @@ public class ImageViewerController {
                 .body(response);
     }
 
-    @GetMapping(value = "{imageName}")
+    @GetMapping(value = "image/{imageName}")
     public ResponseEntity<Object> getImage(@PathVariable(value = "imageName") String imageName) throws IOException {
         Object response = service.getImage(imageName);
         return ResponseEntity.ok()

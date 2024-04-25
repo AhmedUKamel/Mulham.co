@@ -1,39 +1,39 @@
 spring:
   application:
-    name: mulham
+    name: Mulham
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     open-in-view: false
     hibernate:
       ddl-auto: update
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${application.datasource.url}
+    username: ${application.datasource.username}
+    password: ${application.datasource.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: ${application.oauth.google.client-id}
+            client-secret: ${application.oauth.google.secret}
             scope:
               - openid
               - profile
               - email
           facebook:
-            client-id: ${FACEBOOK_CLIENT_ID}
-            client-secret: ${FACEBOOK_CLIENT_PASSWORD}
+            client-id: ${application.oauth.facebook.client-id}
+            client-secret: ${application.oauth.facebook.secret}
   servlet:
     multipart:
       enabled: true
       max-file-size: 2MB
   mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    host: ${application.mail.host}
+    port: ${application.mail.port}
+    username: ${application.mail.username}
+    password: ${application.mail.password}
     properties:
       mail:
         smtp:

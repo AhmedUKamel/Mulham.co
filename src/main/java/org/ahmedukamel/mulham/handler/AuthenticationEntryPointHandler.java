@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.ahmedukamel.mulham.dto.response.ApiResponse;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -20,9 +21,11 @@ public class AuthenticationEntryPointHandler implements AuthenticationEntryPoint
         if (response.isCommitted()) {
             return;
         }
-        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage(), ex.getClass());
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        new ObjectMapper().writeValue(response.getWriter(), apiResponse);
 
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        ApiResponse apiResponse = new ApiResponse(false, "Authorization is missing.", "");
+        new ObjectMapper().writeValue(response.getWriter(), apiResponse);
     }
 }

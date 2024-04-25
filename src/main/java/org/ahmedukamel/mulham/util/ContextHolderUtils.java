@@ -2,6 +2,7 @@ package org.ahmedukamel.mulham.util;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.ahmedukamel.mulham.model.User;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
@@ -19,5 +20,9 @@ public class ContextHolderUtils {
 
     public static User getUserOrElseThrow() {
         return getUser().orElseThrow(EntityNotFoundException::new);
+    }
+
+    public static String getLanguageCode () {
+        return LocaleContextHolder.getLocale().getLanguage();
     }
 }

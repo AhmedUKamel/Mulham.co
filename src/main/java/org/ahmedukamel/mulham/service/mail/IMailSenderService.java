@@ -1,7 +1,9 @@
 package org.ahmedukamel.mulham.service.mail;
 
-import jakarta.mail.MessagingException;
+import java.io.File;
 
 public interface IMailSenderService {
-    void send(Object object) throws MessagingException;
+    default void send(Email email) {}
+
+    default void send(Email email, File... files) {}
 }

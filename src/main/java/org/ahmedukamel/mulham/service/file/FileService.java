@@ -32,7 +32,7 @@ public class FileService implements IFileService {
         }
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String fileName = String.format("%s.%s", name, extension);
+        String fileName = "%s.%s".formatted(name, extension);
 
         Path filePath = directoryPath.resolve(fileName);
         if (Files.exists(filePath)) {
@@ -46,7 +46,7 @@ public class FileService implements IFileService {
     @Override
     public byte[] get(String fileName, String path) throws IOException {
         Path filePath = Path.of(path).resolve(fileName);
-        return Files.exists(filePath) ? Files.readAllBytes(filePath) : null;
+        return Files.readAllBytes(filePath);
     }
 
     @Override

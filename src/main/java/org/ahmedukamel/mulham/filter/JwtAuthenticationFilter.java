@@ -5,18 +5,18 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.ahmedukamel.mulham.constant.JwtConstants;
 import org.ahmedukamel.mulham.dto.response.ApiResponse;
 import org.ahmedukamel.mulham.model.User;
-import org.ahmedukamel.mulham.model.enumeration.Provider;
 import org.ahmedukamel.mulham.repository.UserRepository;
-import org.ahmedukamel.mulham.service.db.DatabaseFetcher;
-import org.ahmedukamel.mulham.util.JsonWebTokenUtils;
+import org.ahmedukamel.mulham.service.token.IAccessTokenService;
+import org.ahmedukamel.mulham.service.token.JsonWebTokenService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
@@ -25,9 +25,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Configuration
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final UserRepository repository;
+    final IAccessTokenService service;
+
+    public JwtAuthenticationFilter(UserRepository repository, JsonWebTokenService service) {
+        this.repository = repository;
+        this.service = service;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -39,28 +44,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (isValidHeader(authorizationHeader)) {
             try {
-                final String jwt = extractJwt(authorizationHeader);
-                final String email = JsonWebTokenUtils.getEmail(jwt);
-                final Provider provider = JsonWebTokenUtils.getProvider(jwt);
+                final String token = extractJwt(authorizationHeader);
+                User user = service.getUser(token);
 
-                if (StringUtils.hasLength(email)) {
-                    User user = DatabaseFetcher.get(repository::findByEmailIgnoreCaseAndProvider, email, provider, User.class);
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContext context = SecurityContextHolder.createEmptyContext();
+                context.setAuthentication(authentication);
+
+                SecurityContextHolder.setContext(context);
 
             } catch (Exception exception) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                ApiResponse apiResponse = new ApiResponse(false, exception.getMessage(), "");
-                new ObjectMapper().writeValue(response.getWriter(), apiResponse);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+                new ObjectMapper().writeValue(response.getWriter(), new ApiResponse(false, exception.getMessage(), ""));
                 return;
             }
         }
 
         filterChain.doFilter(request, response);
-
     }
 
     private String extractJwt(String header) {
