@@ -17,7 +17,8 @@ public class ServiceDtoMapper implements Function<Service, ServiceDto> {
                 service.getEnglishDescription(),
                 service.getArabicDescription(),
                 service.getCost(),
-                service.getCategory().getId()
+                service.getCategory().getId(),
+                service.getMinutes()
         );
     }
 }

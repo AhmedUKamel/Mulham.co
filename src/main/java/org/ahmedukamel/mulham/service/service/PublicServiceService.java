@@ -50,4 +50,17 @@ public class PublicServiceService implements IPublicServiceService {
 
         return new ApiResponse(true, "All Services returned successfully!", response);
     }
+
+    @Override
+    public Object getMostPopularServices(long pageSize, long pageNumber) {
+        List<ServiceResponse> response = serviceRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparingInt(Service::getId))
+                .skip(pageSize * (pageNumber - 1))
+                .limit(pageSize)
+                .map(mapper)
+                .toList();
+
+        return new ApiResponse(true, "All Services returned successfully!", response);
+    }
 }

@@ -27,5 +27,10 @@ public record ServiceDto(
 
         @NotNull
         @Min(value = 1)
-        Integer categoryId) {
+        Integer categoryId,
+
+        @NotNull
+        @Min(value = 1)
+        Integer minutes
+) {
 }

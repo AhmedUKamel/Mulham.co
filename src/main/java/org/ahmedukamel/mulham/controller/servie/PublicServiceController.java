@@ -30,4 +30,10 @@ public class PublicServiceController {
                                          @Min(value = 1) @RequestParam(value = "number") long pageNumber) {
         return ResponseEntity.ok().body(service.getServices(pageSize, pageNumber));
     }
+
+    @GetMapping(value = "most-popular")
+    public ResponseEntity<?> getMostPopularServices(@Min(value = 1) @RequestParam(value = "size", defaultValue = "10") long pageSize,
+                                                    @Min(value = 1) @RequestParam(value = "number", defaultValue = "1") long pageNumber) {
+        return ResponseEntity.ok().body(service.getMostPopularServices(pageSize, pageNumber));
+    }
 }

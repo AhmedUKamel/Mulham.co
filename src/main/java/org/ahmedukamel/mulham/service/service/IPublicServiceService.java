@@ -7,4 +7,6 @@ public interface IPublicServiceService {
     Object getServices();
 
     Object getServices(long pageSize, long pageNumber);
+
+    Object getMostPopularServices(long pageSize, long pageNumber);
 }
